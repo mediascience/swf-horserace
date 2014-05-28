@@ -313,7 +313,7 @@ public class RaceFlowImpl implements RaceFlow {
 	private Promise<Status> runLap(final String name, final int lapNum,
 			final Promise<Status> prevStatus, final Promise<?>... waitFor) {
 
-		if (prevStatus.get().equals("ok")) {
+		if (prevStatus.get() == Status.OK) {
 			/*
 			 * horse is ok, run it.
 			 */
