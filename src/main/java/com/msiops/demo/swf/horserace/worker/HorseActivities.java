@@ -20,21 +20,35 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.Activities;
 import com.amazonaws.services.simpleworkflow.flow.annotations.ActivityRegistrationOptions;
 
 /**
- * General activities for monitoring the workflow.
+ * Activities performed during a horse race.
  *
- * @author greg wiley <aztec.rex@jammm.com>
+ * @author greg wiley <actec.rex@jammm.com>
  *
  */
 @Activities(version = "1.0.0")
 @ActivityRegistrationOptions(defaultTaskStartToCloseTimeoutSeconds = 15, defaultTaskScheduleToStartTimeoutSeconds = 15)
-public interface SystemActivities {
+public interface HorseActivities {
 
 	/**
-	 * Put an entry in the log.
+	 * Bring a horse to the starting gate and ready it for running.
 	 *
-	 * @param s
-	 *            value to log.
+	 * @param name
+	 *            name of arriving horse.
 	 */
-	void log(String s);
+	void arriveGate(String name);
+
+	/**
+	 * Run a horse around the track one time. A horse has a chance of becoming
+	 * injured while running.
+	 *
+	 * @param horseName
+	 *            name of horse to run.
+	 *
+	 * @param lapNum
+	 *            the current lap number.
+	 *
+	 * @return result of attempting the lap.
+	 */
+	Status runLap(String horseName, int lapNum);
 
 }

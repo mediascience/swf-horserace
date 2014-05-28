@@ -29,7 +29,58 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.ActivityRegistrati
  */
 @Activities(version = "1.0.0")
 @ActivityRegistrationOptions(defaultTaskStartToCloseTimeoutSeconds = 15, defaultTaskScheduleToStartTimeoutSeconds = 15)
-public interface RaceActivities {
+public interface AnnouncerActivities {
+
+	/**
+	 * Announce the end of a race.
+	 */
+	public void announceEnd();
+
+	/**
+	 * Announce that a horse finished without placing.
+	 *
+	 * @param name
+	 *            horse name.
+	 */
+	public void announceFinished(String name);
+
+	/**
+	 * Announce that a horse is injured.
+	 *
+	 * @param name
+	 */
+	public void announceInjury(String name);
+
+	/**
+	 * Announce that a horse has completed a lap.
+	 *
+	 * @param name
+	 *            horse name.
+	 *
+	 * @param lap
+	 *            lap number
+	 */
+	public void announceLap(String name, int lap);
+
+	/**
+	 * Announce that a horse is missing. This happens if the horse's status
+	 * cannot be determined (bad flow logic).
+	 *
+	 * @param name
+	 */
+	public void announceMissing(String name);
+
+	/**
+	 * Announce that a horse placed.
+	 *
+	 * @param name
+	 *            horse name.
+	 *
+	 * @param place
+	 *            horse place.
+	 *
+	 */
+	public void announcePlace(String name, int place);
 
 	/**
 	 * Announce the start of a race.
@@ -41,45 +92,5 @@ public interface RaceActivities {
 	 *            the number laps in the race.
 	 */
 	public void announceRace(List<String> names, int laps);
-
-	/**
-	 * Bring a horse to the starting gate and ready it for running.
-	 *
-	 * @param name
-	 *            name of arriving horse.
-	 */
-	void arriveHorse(String name);
-
-	/**
-	 * Announce that an injured horse is leaving.
-	 *
-	 * @param horseName
-	 *            name of leaving horse.
-	 */
-	void leaveHorse(String horseName);
-
-	/**
-	 * Announce that a horse has placed.
-	 *
-	 * @param horseName
-	 *            name of horse to announce.
-	 *
-	 * @param place
-	 *            finishing place.
-	 */
-	void placeHorse(String horseName, int place);
-
-	/**
-	 * Run a horse around the track one time.
-	 *
-	 * @param horseName
-	 *            name of horse to run.
-	 *
-	 * @param lapNum
-	 *            the current lap number.
-	 *
-	 * @return result of attempting lap.
-	 */
-	Status runHorse(String horseName, int lapNum);
 
 }

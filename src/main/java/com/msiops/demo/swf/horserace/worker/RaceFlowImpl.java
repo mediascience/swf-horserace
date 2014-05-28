@@ -33,9 +33,14 @@ import com.amazonaws.services.simpleworkflow.flow.core.Promise;
  */
 public class RaceFlowImpl implements RaceFlow {
 
-	private final RaceActivitiesClient race = new RaceActivitiesClientImpl();
+	// private final RaceActivitiesClient race = new RaceActivitiesClientImpl();
 
-	private final SystemActivitiesClient sys = new SystemActivitiesClientImpl();
+	// private final SystemActivitiesClient sys = new
+	// SystemActivitiesClientImpl();
+
+	private final AnnouncerActivitiesClient announcer = new AnnouncerActivitiesClientImpl();
+
+	private final HorseActivitiesClient horses = new HorseActivitiesClientImpl();
 
 	/**
 	 * The next horse that finishes gets this place. Even though the workflow is
@@ -53,7 +58,7 @@ public class RaceFlowImpl implements RaceFlow {
 		final List<Promise<String>> arrivals = new ArrayList<>(
 				horseNames.size());
 		for (final String name : horseNames) {
-			final Promise<String> arrival = subst(name, arriveHorse(name));
+			final Promise<String> arrival = subst(name, arriveGate(name));
 			arrivals.add(arrival);
 		}
 
@@ -82,8 +87,33 @@ public class RaceFlowImpl implements RaceFlow {
 		 * Before exiting the workflow, ensure that all horses have finished and
 		 * all pending tasks are complete.
 		 */
-		log("Finished", join(results));
+		announceEnd(join(results));
 
+	}
+
+	/**
+	 * Local wrapper for activities client invocation. This lets us specify
+	 * retry policy that handles failures from workers and from SWF itself. All
+	 * parameters passed directly to client and return whatever the client
+	 * returns.
+	 */
+	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
+	@Asynchronous
+	private Promise<Void> announceEnd(final Promise<?>... waitFor) {
+		return this.announcer.announceEnd();
+	}
+
+	/**
+	 * Local wrapper for activities client invocation. This lets us specify
+	 * retry policy that handles failures from workers and from SWF itself. All
+	 * parameters passed directly to client and return whatever the client
+	 * returns.
+	 */
+	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
+	@Asynchronous
+	private Promise<Void> announceFinished(final String name,
+			final Promise<?>... waitFor) {
+		return this.announcer.announceFinished(name);
 	}
 
 	/**
@@ -109,17 +139,17 @@ public class RaceFlowImpl implements RaceFlow {
 		switch (result.get()) {
 		case OK:
 			if (this.nextPlace <= 3) {
-				rval = placeHorse(name, this.nextPlace);
+				rval = announcePlace(name, this.nextPlace);
 				this.nextPlace = this.nextPlace + 1;
 			} else {
-				rval = log("'" + name + "' did not place");
+				rval = announceFinished(name);
 			}
 			break;
 		case INJURY:
-			rval = leaveHorse(name);
+			rval = announceInjury(name);
 			break;
 		default:
-			rval = log("What happened to '" + name + "?'");
+			rval = announceMissing(name);
 			break;
 		}
 		return rval;
@@ -133,10 +163,52 @@ public class RaceFlowImpl implements RaceFlow {
 	 */
 	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
 	@Asynchronous
-	private Promise<Void> announceRace(final Promise<List<String>> horses,
-			final Promise<Integer> laps, final Promise<?>... waitFor) {
+	private Promise<Void> announceInjury(final String name,
+			final Promise<?>... waitFor) {
+		return this.announcer.announceInjury(name);
+	}
 
-		return this.race.announceRace(horses, laps);
+	/**
+	 * Local wrapper for activities client invocation. This lets us specify
+	 * retry policy that handles failures from workers and from SWF itself. All
+	 * parameters passed directly to client and return whatever the client
+	 * returns.
+	 */
+	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
+	@Asynchronous
+	private Promise<Void> announceLap(final String name, final int lap,
+			final Promise<?>... waitFor) {
+		return this.announcer.announceLap(name, lap);
+	}
+
+	/**
+	 * Announce a lap only if the result was OK.
+	 *
+	 * @param name
+	 *            horse name.
+	 *
+	 * @param lap
+	 *            lap number.
+	 *
+	 * @param result
+	 *            result of running lap.
+	 *
+	 * @param waitFor
+	 *            anonymous dependencies.
+	 *
+	 * @return the passed result.
+	 */
+	@Asynchronous
+	private Promise<Status> announceLapIfOk(final String name, final int lap,
+			final Promise<Status> result, final Promise<?>... waitFor) {
+
+		final Promise<Status> rval;
+		if (result.get() == Status.OK) {
+			rval = subst(result.get(), announceLap(name, lap));
+		} else {
+			rval = result;
+		}
+		return rval;
 
 	}
 
@@ -148,9 +220,50 @@ public class RaceFlowImpl implements RaceFlow {
 	 */
 	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
 	@Asynchronous
-	private Promise<Void> arriveHorse(final String name,
+	private Promise<Void> announceMissing(final String name,
 			final Promise<?>... waitFor) {
-		return this.race.arriveHorse(name);
+		return this.announcer.announceMissing(name);
+	}
+
+	/**
+	 * Local wrapper for activities client invocation. This lets us specify
+	 * retry policy that handles failures from workers and from SWF itself. All
+	 * parameters passed directly to client and return whatever the client
+	 * returns.
+	 */
+	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
+	@Asynchronous
+	private Promise<Void> announcePlace(final String name, final Integer place,
+			final Promise<?>... waitFor) {
+		return this.announcer.announcePlace(name, place);
+	}
+
+	/**
+	 * Local wrapper for activities client invocation. This lets us specify
+	 * retry policy that handles failures from workers and from SWF itself. All
+	 * parameters passed directly to client and return whatever the client
+	 * returns.
+	 */
+	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
+	@Asynchronous
+	private Promise<Void> announceRace(final Promise<List<String>> horses,
+			final Promise<Integer> laps, final Promise<?>... waitFor) {
+
+		return this.announcer.announceRace(horses, laps);
+
+	}
+
+	/**
+	 * Local wrapper for activities client invocation. This lets us specify
+	 * retry policy that handles failures from workers and from SWF itself. All
+	 * parameters passed directly to client and return whatever the client
+	 * returns.
+	 */
+	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
+	@Asynchronous
+	private Promise<Void> arriveGate(final String name,
+			final Promise<?>... waitFor) {
+		return this.horses.arriveGate(name);
 	}
 
 	/**
@@ -190,61 +303,6 @@ public class RaceFlowImpl implements RaceFlow {
 	}
 
 	/**
-	 * Local wrapper for activities client invocation. This lets us specify
-	 * retry policy that handles failures from workers and from SWF itself. All
-	 * parameters passed directly to client and return whatever the client
-	 * returns.
-	 */
-	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
-	@Asynchronous
-	private Promise<Void> leaveHorse(final String name,
-			final Promise<?>... waitFor) {
-		return this.race.leaveHorse(name);
-	}
-
-	/**
-	 * Local wrapper for activities client invocation. This lets us specify
-	 * retry policy that handles failures from workers and from SWF itself. All
-	 * parameters passed directly to client and return whatever the client
-	 * returns.
-	 */
-	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
-	@Asynchronous
-	private Promise<Void> log(final Object o, final Promise<?>... waitFor) {
-		return this.sys.log(String.valueOf(o));
-	}
-
-	/**
-	 * Log a promised value.
-	 *
-	 * @param po
-	 *            promised value.
-	 *
-	 * @param waitFor
-	 *            anonymous dependencies.
-	 *
-	 * @return promise to log promised value.
-	 */
-	@Asynchronous
-	private Promise<Void> log(final Promise<? extends Object> po,
-			final Promise<?>... waitFor) {
-		return log(po.get());
-	}
-
-	/**
-	 * Local wrapper for activities client invocation. This lets us specify
-	 * retry policy that handles failures from workers and from SWF itself. All
-	 * parameters passed directly to client and return whatever the client
-	 * returns.
-	 */
-	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
-	@Asynchronous
-	private Promise<Void> placeHorse(final String name, final Integer place,
-			final Promise<?>... waitFor) {
-		return this.race.placeHorse(name, place);
-	}
-
-	/**
 	 * Run all the horses in parallel.
 	 *
 	 * @param laps
@@ -267,7 +325,8 @@ public class RaceFlowImpl implements RaceFlow {
 
 			Promise<Status> horseRun = Promise.asPromise(Status.OK);
 			for (int lapNum = 1; lapNum <= laps; lapNum = lapNum + 1) {
-				horseRun = runLap(name, lapNum, horseRun);
+				horseRun = runLapIfOk(name, lapNum, horseRun);
+				horseRun = announceLapIfOk(name, lapNum, horseRun);
 			}
 			final Promise<Void> done = announceHorseResult(name, horseRun);
 
@@ -287,9 +346,9 @@ public class RaceFlowImpl implements RaceFlow {
 	 */
 	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
 	@Asynchronous
-	private Promise<Status> runHorse(final String name, final int lapNum,
+	private Promise<Status> runLap(final String name, final int lapNum,
 			final Promise<?>... waitFor) {
-		return this.race.runHorse(name, lapNum);
+		return this.horses.runLap(name, lapNum);
 	}
 
 	/**
@@ -310,14 +369,14 @@ public class RaceFlowImpl implements RaceFlow {
 	 * @return the result of running one lap or the previous lap result.
 	 */
 	@Asynchronous
-	private Promise<Status> runLap(final String name, final int lapNum,
+	private Promise<Status> runLapIfOk(final String name, final int lapNum,
 			final Promise<Status> prevStatus, final Promise<?>... waitFor) {
 
 		if (prevStatus.get() == Status.OK) {
 			/*
 			 * horse is ok, run it.
 			 */
-			return runHorse(name, lapNum);
+			return runLap(name, lapNum);
 		} else {
 			/*
 			 * something wrong, do not run.

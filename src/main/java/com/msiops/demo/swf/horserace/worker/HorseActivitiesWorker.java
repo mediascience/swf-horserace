@@ -19,7 +19,7 @@ package com.msiops.demo.swf.horserace.worker;
 import com.amazonaws.services.simpleworkflow.AmazonSimpleWorkflowClient;
 import com.amazonaws.services.simpleworkflow.flow.ActivityWorker;
 
-public class RaceActivitiesWorker {
+public class HorseActivitiesWorker {
 
 	/**
 	 * This is the actual client interface used by the worker implementations.
@@ -29,7 +29,7 @@ public class RaceActivitiesWorker {
 	 */
 	private static final AmazonSimpleWorkflowClient SWF = new AmazonSimpleWorkflowClient();
 
-	private static final String TASKLIST = "RACEACTIVITIES-1.0";
+	private static final String TASKLIST = "HORSEACTIVITIES-1.0";
 
 	private static final String DOMAIN = "Demo";
 
@@ -37,13 +37,13 @@ public class RaceActivitiesWorker {
 
 		final int instance = args.length > 0 ? Integer.valueOf(args[0]) : 1;
 
-		new RaceActivitiesWorker(instance).start();
+		new HorseActivitiesWorker(instance).start();
 
 	}
 
 	private final ActivityWorker worker;
 
-	private RaceActivitiesWorker(final int instance) throws Exception {
+	private HorseActivitiesWorker(final int instance) throws Exception {
 
 		/*
 		 * Configure an Flow Framework ACTIVITY worker with a domain and queue.
@@ -55,8 +55,8 @@ public class RaceActivitiesWorker {
 		 * singleton that remains active for the duration of the worker. There
 		 * should be no shared mutable state in an activities implementation.
 		 */
-		this.worker
-			.addActivitiesImplementation(new RaceActivitiesImpl(instance));
+		this.worker.addActivitiesImplementation(new HorseActivitiesImpl(
+				instance));
 
 	}
 
