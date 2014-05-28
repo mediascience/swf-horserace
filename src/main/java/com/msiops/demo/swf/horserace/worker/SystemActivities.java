@@ -26,7 +26,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.ActivityRegistrati
  *
  */
 @Activities(version = "1.0.0")
-@ActivityRegistrationOptions(defaultTaskStartToCloseTimeoutSeconds = 60, defaultTaskScheduleToStartTimeoutSeconds = 60)
+@ActivityRegistrationOptions(defaultTaskStartToCloseTimeoutSeconds = 15, defaultTaskScheduleToStartTimeoutSeconds = 15)
 public interface SystemActivities {
 
 	/**

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RaceActivitiesImpl implements RaceActivities {
 
-	private static final double CHANCE_OF_INJURY = 0.1;
+	private static final double CHANCE_OF_INJURY = 0.035;
 
 	private final int instance;
 
