@@ -18,12 +18,18 @@ package com.msiops.demo.swf.horserace.worker;
 
 import java.util.Collection;
 
+import com.amazonaws.services.simpleworkflow.flow.annotations.Execute;
+import com.amazonaws.services.simpleworkflow.flow.annotations.Workflow;
+import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrationOptions;
+
 /**
  * Run a horse race.
  * 
  * @author greg wiley <aztec.rex@jammm.com>
  *
  */
+@Workflow
+@WorkflowRegistrationOptions(defaultExecutionStartToCloseTimeoutSeconds = 900, defaultTaskStartToCloseTimeoutSeconds = 60)
 public interface RaceFlow {
 
 	/**
@@ -36,6 +42,7 @@ public interface RaceFlow {
 	 * @param laps
 	 *            the number laps to run.
 	 */
+	@Execute(version = "1.0.0")
 	void go(Collection<String> horseNames, int laps);
 
 }
