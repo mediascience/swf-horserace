@@ -56,7 +56,7 @@ public class RaceActivitiesWorker {
 		 * should be no shared mutable state in an activities implementation.
 		 */
 		this.worker
-		.addActivitiesImplementation(new RaceActivitiesImpl(instance));
+			.addActivitiesImplementation(new RaceActivitiesImpl(instance));
 
 	}
 
