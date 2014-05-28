@@ -1,4 +1,6 @@
-# Amazon SWF and Flow Framework Demonstration
+# SWF Horserace
 
-Just a stub.
+Demonstrate Amazon SWF and Flow Framework for Java with a simple
+horse race.
+
 
