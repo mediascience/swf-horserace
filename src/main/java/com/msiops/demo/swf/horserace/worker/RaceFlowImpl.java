@@ -81,20 +81,24 @@ public class RaceFlowImpl implements RaceFlow {
 	 */
 	@Asynchronous
 	private Promise<Void> announceHorseResult(final String name,
-			final Promise<String> result, final Promise<?>... waitFor) {
+			final Promise<Status> result, final Promise<?>... waitFor) {
 
 		final Promise<Void> rval;
-		if (result.get().equals("ok")) {
+		switch (result.get()) {
+		case OK:
 			if (this.nextPlace <= 3) {
 				rval = placeHorse(name, this.nextPlace);
 				this.nextPlace = this.nextPlace + 1;
 			} else {
 				rval = log("'" + name + "' did not place");
 			}
-		} else if (result.get().equals("injured")) {
+			break;
+		case INJURY:
 			rval = leaveHorse(name);
-		} else {
+			break;
+		default:
 			rval = log("What happened to '" + name + "?'");
+			break;
 		}
 		return rval;
 	}
@@ -239,7 +243,7 @@ public class RaceFlowImpl implements RaceFlow {
 		final List<Promise<Void>> race = new ArrayList<>(horses.get().size());
 		for (final String name : horses.get()) {
 
-			Promise<String> horseRun = Promise.asPromise("ok");
+			Promise<Status> horseRun = Promise.asPromise(Status.OK);
 			for (int lapNum = 1; lapNum <= laps; lapNum = lapNum + 1) {
 				horseRun = runLap(name, lapNum, horseRun);
 			}
@@ -261,7 +265,7 @@ public class RaceFlowImpl implements RaceFlow {
 	 */
 	@ExponentialRetry(initialRetryIntervalSeconds = 2, maximumRetryIntervalSeconds = 30, maximumAttempts = 5)
 	@Asynchronous
-	private Promise<String> runHorse(final String name, final int lapNum,
+	private Promise<Status> runHorse(final String name, final int lapNum,
 			final Promise<?>... waitFor) {
 		return this.race.runHorse(name, lapNum);
 	}
@@ -284,8 +288,8 @@ public class RaceFlowImpl implements RaceFlow {
 	 * @return the result of running one lap or the previous lap result.
 	 */
 	@Asynchronous
-	private Promise<String> runLap(final String name, final int lapNum,
-			final Promise<String> prevStatus, final Promise<?>... waitFor) {
+	private Promise<Status> runLap(final String name, final int lapNum,
+			final Promise<Status> prevStatus, final Promise<?>... waitFor) {
 
 		if (prevStatus.get().equals("ok")) {
 			/*

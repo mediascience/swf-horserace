@@ -62,8 +62,8 @@ public interface RaceActivities {
 	 * @param lapNum
 	 *            the current lap number.
 	 *
-	 * @return result, either "ok" or "injury"
+	 * @return result of attempting lap.
 	 */
-	String runHorse(String horseName, int lapNum);
+	Status runHorse(String horseName, int lapNum);
 
 }
