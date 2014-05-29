@@ -19,6 +19,12 @@ package com.msiops.demo.swf.horserace.worker;
 
 import java.util.List;
 
+/**
+ * Implement announcer behavior.
+ * 
+ * @author greg wiley <aztec.rex@jammm.com>
+ *
+ */
 final class AnnouncerActivitiesImpl implements AnnouncerActivities {
 
 	private final int instance;
@@ -74,8 +80,17 @@ final class AnnouncerActivitiesImpl implements AnnouncerActivities {
 		say("And they're off!");
 	}
 
+	/**
+	 * Announce something.
+	 * 
+	 * @param s
+	 *            what to announce.
+	 */
 	private void say(final String s) {
 
+		/*
+		 * include the instance id to demonstrate load balancing.
+		 */
 		final String msg = String.format("ANNOUNCER %d: %s", this.instance, s);
 		System.out.println(msg);
 

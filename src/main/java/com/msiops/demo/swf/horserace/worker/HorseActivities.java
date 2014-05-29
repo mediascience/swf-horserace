@@ -22,7 +22,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.ActivityRegistrati
 /**
  * Activities performed during a horse race.
  *
- * @author greg wiley <actec.rex@jammm.com>
+ * @author greg wiley <aztec.rex@jammm.com>
  *
  */
 @Activities(version = "1.0.0")
@@ -41,7 +41,7 @@ public interface HorseActivities {
 	 * Run a horse around the track one time. A horse has a chance of becoming
 	 * injured while running.
 	 *
-	 * @param horseName
+	 * @param name
 	 *            name of horse to run.
 	 *
 	 * @param lapNum
@@ -49,6 +49,6 @@ public interface HorseActivities {
 	 *
 	 * @return result of attempting the lap.
 	 */
-	Status runLap(String horseName, int lapNum);
+	Status runLap(String name, int lapNum);
 
 }

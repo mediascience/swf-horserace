@@ -19,6 +19,15 @@ package com.msiops.demo.swf.horserace.worker;
 import com.amazonaws.services.simpleworkflow.AmazonSimpleWorkflowClient;
 import com.amazonaws.services.simpleworkflow.flow.ActivityWorker;
 
+/**
+ * <p>
+ * This class provides the full announcer worker implementation, including
+ * polling for tasks, performing announcer duties, and reporting results.
+ * </p>
+ * 
+ * @author greg wiley <aztec.rex@jammm.com>
+ *
+ */
 public class AnnouncerActivitiesWorker {
 
 	/**
@@ -29,8 +38,24 @@ public class AnnouncerActivitiesWorker {
 	 */
 	private static final AmazonSimpleWorkflowClient SWF = new AmazonSimpleWorkflowClient();
 
+	/**
+	 * The task list that this worker listens on. It also becomes the default task
+	 * list for this worker's activity types if this worker registers them.
+	 */
 	private static final String TASKLIST = "ANNOUNCERACTIVITIES-1.0";
 
+	/**
+	 * <p>
+	 * Domain is an administrative boundary in SWF. You are limited to 100
+	 * domains per account and they cannot be deleted. You create a domain
+	 * through an API call or through the AWS web console.
+	 * </p>
+	 * <p>
+	 * Note that a domain is configured with a workflow retention period that
+	 * cannot be changed. Also, there hard limits on the numbers of workflow and
+	 * activity types and versions that can be registered on a domain.
+	 * </p>
+	 */
 	private static final String DOMAIN = "Demo";
 
 	public static void main(final String[] args) throws Exception {
@@ -41,6 +66,9 @@ public class AnnouncerActivitiesWorker {
 
 	}
 
+	/**
+	 * Delegate worker provided by FF.
+	 */
 	private final ActivityWorker worker;
 
 	private AnnouncerActivitiesWorker(final int instance) throws Exception {
@@ -61,6 +89,15 @@ public class AnnouncerActivitiesWorker {
 	}
 
 	private void start() {
+		/*
+		 * By default and if not already registered, starting a ActivityWorker
+		 * registers all activity types and versions captured from the @Activity
+		 * annotations of the classes whose instances are registered to it.
+		 * 
+		 * It also sets the default timeouts and task list for the types from
+		 * the settings in the annotations. Once set, those values cannot be
+		 * changed so beware.
+		 */
 		this.worker.start();
 	}
 

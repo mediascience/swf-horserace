@@ -23,7 +23,8 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.Workflow;
 import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrationOptions;
 
 /**
- * Run a horse race.
+ * Horse Race workflow. The implementation of this class will implement the
+ * workflow logic.
  *
  * @author greg wiley <aztec.rex@jammm.com>
  *
@@ -33,8 +34,15 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrati
 public interface RaceFlow {
 
 	/**
+	 * <p>
 	 * Start the race including organizing the horses, counting laps, and
 	 * announcing winners.
+	 * </p>
+	 * <p>
+	 * Note that the method is marked with {@link Execute}. This signals the
+	 * stub generator to generate corresponding methods in the stubs and
+	 * configure the stubs to use them to request new workflows.
+	 * </p>
 	 *
 	 * @param horseNames
 	 *            the names of the horses in the race.

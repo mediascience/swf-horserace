@@ -19,6 +19,7 @@ package com.msiops.demo.swf.horserace.worker;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import com.amazonaws.services.simpleworkflow.flow.annotations.Asynchronous;
 import com.amazonaws.services.simpleworkflow.flow.annotations.ExponentialRetry;
@@ -26,17 +27,35 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.Wait;
 import com.amazonaws.services.simpleworkflow.flow.core.Promise;
 
 /**
- * Race flow implemtation.
+ * <p>
+ * Race flow implementation. An instance of this class will be created and its
+ * {@link #go(Collection, int)} method will be invoked whenever a workflow
+ * decision is required. Things to be aware of when programming the workflow.
+ * </p>
+ * <ul>
+ * <li>Your code must always follow the same execution path.</li>
+ * <li>The code must be side-effect free. That means, in particular, that you
+ * cannot
+ * <ol>
+ * <li>use a random value (beware of {@link UUID#randomUUID()}</li>
+ * <li>log anything</li>
+ * <li>use a {@link System#currentTimeMillis()} value (but you can use a flow
+ * framework clock for "current" time)</li>
+ * <li>read or write a file</li>
+ * </ol>
+ * </li>
+ * <li>You are limited to 32KB of parameter data when scheduling an activity.</li>
+ * <li>Promises are not like you might expect. The API lets you unwrap them at
+ * any time but you cannot. A promise can only be unwrapped from inside an
+ * {@link Asynchronous} method which has been passed that promise as a
+ * parameter.</li>
+ * <li>
+ * </ul>
  *
  * @author greg wiley <aztec.rex@jammm.com>
  *
  */
 public class RaceFlowImpl implements RaceFlow {
-
-	// private final RaceActivitiesClient race = new RaceActivitiesClientImpl();
-
-	// private final SystemActivitiesClient sys = new
-	// SystemActivitiesClientImpl();
 
 	private final AnnouncerActivitiesClient announcer = new AnnouncerActivitiesClientImpl();
 
@@ -271,7 +290,9 @@ public class RaceFlowImpl implements RaceFlow {
 	 * this to synchronize multiple independent promises.
 	 *
 	 * @param async
-	 *            independent promises to synchronize.
+	 *            independent promises to synchronize. Notice the {@link Wait}
+	 *            annotation. It tells FF that we want to wait for every promise
+	 *            in the collection to be fulfilled.
 	 *
 	 * @param waitFor
 	 *            anonymous dependencies.

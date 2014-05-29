@@ -28,6 +28,8 @@ import com.msiops.demo.swf.horserace.worker.RaceFlowClientExternalFactory;
 import com.msiops.demo.swf.horserace.worker.RaceFlowClientExternalFactoryImpl;
 
 /**
+ * Kick off a horse race. When run, this request the start of a new workflow in
+ * Amazon AWS.
  *
  * @author greg wiley <aztec.rex@jammm.com>
  *
@@ -41,8 +43,8 @@ public final class HorseRace {
 	/**
 	 * This is the actual client interface used by the generated external flow
 	 * client. Its credentials can be configured like any other client in the
-	 * Java SDK. By default, it checks the environment, system properties, and
-	 * (if running on EC2) the host role.
+	 * AWS Java SDK. By default, it checks the environment, system properties,
+	 * and (if running on EC2) the host role.
 	 */
 	private static final AmazonSimpleWorkflowClient SWF = new AmazonSimpleWorkflowClient();
 
@@ -65,12 +67,27 @@ public final class HorseRace {
 
 	}
 
+	/**
+	 * Client stub for requesting workflows from outside of FlowFramework
+	 * enhanced code. FF code generation adds the "ClientExternal" suffix.
+	 */
 	private final RaceFlowClientExternal race = CLIENTS.getClient();
 
+	/**
+	 * Names of the horses running in the race. This becomes a parameter to the
+	 * workflow creation.
+	 */
 	private final List<String> horses;
 
+
+	/**
+	 * Number of laps to run. This becomes a parameter to the workflow creation.
+	 */
 	private final int laps;
 
+	/**
+	 * Default horse names are taken from "Mr. Magoo and the Seven Dwarfs"
+	 */
 	private static final List<String> DEFAULT_HORSES = Arrays.asList("Axlerod",
 			"Bartholomew", "Cornelius", "Dexter", "Eustace", "Ferdinand",
 			"George");
@@ -84,7 +101,17 @@ public final class HorseRace {
 
 	}
 
+	/**
+	 * Start the race.
+	 */
 	public void go() {
+		/*
+		 * invoke FF SWF client stub. Note that the name of this method is taken
+		 * from the interface method marked with @Execute.
+		 * 
+		 * Other interface methods can be marked with @Signal. Any such methods
+		 * become methods in the client stub for signaling an active workflow.
+		 */
 		this.race.go(this.horses, this.laps);
 	}
 }

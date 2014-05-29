@@ -24,7 +24,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.ActivityRegistrati
 /**
  * Activities performed during a horse race.
  *
- * @author greg wiley <actec.rex@jammm.com>
+ * @author greg wiley <aztec.rex@jammm.com>
  *
  */
 @Activities(version = "1.0.0")

@@ -37,6 +37,10 @@ final class HorseActivitiesImpl implements HorseActivities {
 
 	private final int instance;
 
+	/**
+	 * An RNG in an activity worker is fine (it is forbidden in a workflow
+	 * worker).
+	 */
 	private final Random rng = new Random();
 
 	private static final int DELAY_BASE_MS = 2000;
@@ -49,9 +53,16 @@ final class HorseActivitiesImpl implements HorseActivities {
 	public void arriveGate(final String name) {
 
 		final long delay = this.rng.nextInt(DELAY_BASE_MS);
+
+		/*
+		 * Log before doing work...
+		 */
 		LOG.info("HORSES {}: {} approaching gate", new Object[] {
 				this.instance, name });
 		delayMs(delay);
+		/*
+		 * ...and after.
+		 */
 		LOG.info("HORSES {}: {} arrive gate after {}ms", new Object[] {
 				this.instance, name, delay });
 
@@ -63,6 +74,10 @@ final class HorseActivitiesImpl implements HorseActivities {
 		final int delayMax;
 		final Status rval;
 		if (this.rng.nextDouble() < CHANCE_OF_INJURY) {
+			/*
+			 * injury can be noticed, on average, in half the time it takes to
+			 * run a lap.
+			 */
 			delayMax = DELAY_BASE_MS / 2;
 			rval = Status.INJURY;
 		} else {
@@ -70,9 +85,17 @@ final class HorseActivitiesImpl implements HorseActivities {
 			rval = Status.OK;
 		}
 		final long delay = this.rng.nextInt(delayMax);
+		
+		/*
+		 * Log before doing work...
+		 */
 		LOG.info("HORSES {}: {} starting lap {}", new Object[] { this.instance,
 				name, lap });
 		delayMs(delay);
+
+		/*
+		 * ...and after.
+		 */
 		LOG.info("HORSES {}: {} {} after {}ms", new Object[] { this.instance,
 				name, rval, delay });
 
