@@ -16,6 +16,8 @@
  */
 package com.msiops.demo.swf.horserace.worker;
 
+import static com.msiops.demo.swf.PromiseUtil.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +25,6 @@ import java.util.UUID;
 
 import com.amazonaws.services.simpleworkflow.flow.annotations.Asynchronous;
 import com.amazonaws.services.simpleworkflow.flow.annotations.ExponentialRetry;
-import com.amazonaws.services.simpleworkflow.flow.annotations.Wait;
 import com.amazonaws.services.simpleworkflow.flow.core.Promise;
 
 /**
@@ -286,44 +287,6 @@ final class RaceFlowImpl implements RaceFlow {
 	}
 
 	/**
-	 * Convert a list of promised values into a promised list of values. Use
-	 * this to synchronize multiple independent promises.
-	 *
-	 * @param async
-	 *            independent promises to synchronize. Notice the {@link Wait}
-	 *            annotation. It tells FF that we want to wait for every promise
-	 *            in the collection to be fulfilled.
-	 *
-	 * @param waitFor
-	 *            anonymous dependencies.
-	 *
-	 * @return promise to fulfill all.
-	 */
-	@Asynchronous
-	private <T> Promise<List<T>> join(@Wait final List<Promise<T>> async,
-			final Promise<?>... waitFor) {
-
-		final List<T> result = new ArrayList<>(async.size());
-		for (final Promise<T> pt : async) {
-			result.add(pt.get());
-		}
-
-		return Promise.asPromise(result);
-
-	}
-
-	/**
-	 * Convenient form of {@link #join(List, Promise...)} for a promised list of
-	 * promises.
-	 *
-	 */
-	@Asynchronous
-	private <T> Promise<List<T>> join(final Promise<List<Promise<T>>> async,
-			final Promise<?>... waitFor) {
-		return join(async.get());
-	}
-
-	/**
 	 * Run all the horses in parallel.
 	 *
 	 * @param laps
@@ -404,24 +367,6 @@ final class RaceFlowImpl implements RaceFlow {
 			 */
 			return prevStatus;
 		}
-
-	}
-
-	/**
-	 * Promise a value based on fulfillment of arbitrary values.
-	 *
-	 * @param sVal
-	 *            promised value.
-	 *
-	 * @param waitFor
-	 *            dependencies.
-	 *
-	 * @return promise to produce sVal.
-	 */
-	@Asynchronous
-	private <T> Promise<T> subst(final T sVal, final Promise<?>... waitFor) {
-
-		return Promise.asPromise(sVal);
 
 	}
 
