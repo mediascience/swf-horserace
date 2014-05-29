@@ -27,7 +27,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.ActivityRegistrati
  */
 @Activities(version = "1.0.0")
 @ActivityRegistrationOptions(defaultTaskStartToCloseTimeoutSeconds = 15, defaultTaskScheduleToStartTimeoutSeconds = 15)
-public interface HorseActivities {
+interface HorseActivities {
 
 	/**
 	 * Bring a horse to the starting gate and ready it for running.

@@ -55,7 +55,7 @@ import com.amazonaws.services.simpleworkflow.flow.core.Promise;
  * @author greg wiley <aztec.rex@jammm.com>
  *
  */
-public class RaceFlowImpl implements RaceFlow {
+final class RaceFlowImpl implements RaceFlow {
 
 	private final AnnouncerActivitiesClient announcer = new AnnouncerActivitiesClientImpl();
 

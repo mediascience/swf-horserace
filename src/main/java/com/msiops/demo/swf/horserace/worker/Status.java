@@ -22,7 +22,7 @@ package com.msiops.demo.swf.horserace.worker;
  * @author greg wiley <aztec.rex@jammm.com>
  *
  */
-public enum Status {
+enum Status {
 
 	OK, INJURY;
 

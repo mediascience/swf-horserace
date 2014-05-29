@@ -28,7 +28,7 @@ import com.amazonaws.services.simpleworkflow.flow.ActivityWorker;
  * @author greg wiley <aztec.rex@jammm.com>
  *
  */
-public class HorseActivitiesWorker {
+public final class HorseActivitiesWorker {
 
 	/**
 	 * This is the actual client interface used by the worker implementations.

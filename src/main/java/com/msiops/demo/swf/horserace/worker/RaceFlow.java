@@ -31,7 +31,7 @@ import com.amazonaws.services.simpleworkflow.flow.annotations.WorkflowRegistrati
  */
 @Workflow
 @WorkflowRegistrationOptions(defaultExecutionStartToCloseTimeoutSeconds = 900, defaultTaskStartToCloseTimeoutSeconds = 60)
-public interface RaceFlow {
+interface RaceFlow {
 
 	/**
 	 * <p>

@@ -28,7 +28,7 @@ import com.amazonaws.services.simpleworkflow.flow.ActivityWorker;
  * @author greg wiley <aztec.rex@jammm.com>
  *
  */
-public class AnnouncerActivitiesWorker {
+public final class AnnouncerActivitiesWorker {
 
 	/**
 	 * This is the actual client interface used by the worker implementations.
