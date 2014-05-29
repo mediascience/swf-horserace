@@ -21,8 +21,7 @@ corresponding to horse behavior.
 
 ## Run
 
-* Download the pre-built jar from GH downloads. This alrady has bytecode
-enhancements applied.
+* Download the pre-built jar from https://s3.amazonaws.com/com-msiops-artifact/demo-swf-horserace-1.0.1-jar-with-dependencies.jar it alread has bytecode enhancements applied.
 * Put the jar in the same directory as the scripts. 
 * Create the "Demo" SWF domain through your AWS console
 * Obtain credentials to operate in the "Demo" SWF domain and add them to the
