@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.msiops.demo</groupId>
-  <artifactId>demo-swf</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <artifactId>demo-swf-horserace</artifactId>
+  <version>0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>DEMO :: SWF</name>
+  <name>DEMO :: SWF :: HORSERACE</name>
   <url>http://www.mediascienceinternational.com</url>
   <prerequisites>
     <maven>3.2.0</maven>
